@@ -49,13 +49,14 @@ public class PlayerTransportTube extends BlockContainer {
 			// " Z=" + ptt.network.get(x).zCoord);
 			// }
 			// System.out.println("--------------------------------------------");
-			if (ptt.network != null)
-				System.out.println(ptt.network.size() + " " + ptt.id);
-			if (ptt.networkHost != null)
-				System.out.println(ptt.networkHost);
-			System.out.println(ptt);
-			if (ptt.networkHost != null)
-				par5EntityPlayer.setPositionAndUpdate(ptt.networkHost.xCoord + 0.5D, ptt.networkHost.yCoord + 1, ptt.networkHost.zCoord + 0.5D);
+			// if (ptt.network != null)
+			// System.out.println(ptt.network.size() + " " + ptt.id);
+			// if (ptt.networkHost != null)
+			// System.out.println(ptt.networkHost);
+			// System.out.println(ptt);
+			// if (ptt.networkHost != null)
+			// par5EntityPlayer.setPositionAndUpdate(ptt.networkHost.xCoord +
+			// 0.5D, ptt.networkHost.yCoord + 1, ptt.networkHost.zCoord + 0.5D);
 		}
 		return super.onBlockActivated(par1World, par2, par3, par4, par5EntityPlayer, par6, par7, par8, par9);
 	}

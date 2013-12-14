@@ -40,7 +40,7 @@ public class TileEntityPlayerTransportTube extends TileEntity {
 					this.networkHost.network.add(this);
 				} else if (hosts.size() == 0 && this.networkHost != null) {
 					this.networkHost.network.remove(this);
-					this.network = null;
+					this.network.clear();
 					this.id = 0;
 					this.networkHost = null;
 				}
@@ -64,6 +64,8 @@ public class TileEntityPlayerTransportTube extends TileEntity {
 	}
 
 	private void becomeHost() {
+		if (this.network == null)
+			this.network = new ArrayList<TileEntityPlayerTransportTube>();
 		for (int x = 0; x < this.network.size(); x++) {
 			if (this.network.get(x).networkHost != this)
 				this.network.remove(this.network.get(x));
@@ -124,7 +126,7 @@ public class TileEntityPlayerTransportTube extends TileEntity {
 		if (this.networkHost != null) {
 			this.networkHost.network.remove(this);
 		}
-		this.network = null;
+		this.network.clear();
 		this.id = 0;
 		this.networkHost = null;
 		// ArrayList<TileEntityPlayerTransportTube> ptt =
@@ -162,12 +164,21 @@ public class TileEntityPlayerTransportTube extends TileEntity {
 			if (dc) {
 				this.dc();
 			}
+			if (this.networkHost != null && !(this.worldObj.getBlockTileEntity(this.networkHost.xCoord, this.networkHost.yCoord, this.networkHost.zCoord) instanceof TileEntityPlayerTransportTube)) {
+				this.networkHost = null;
+			}
 
 		}
 		if (this.networkHost == this) {
 			if (this.oldNetworkSize != this.network.size()) {
-				this.checkIfConnected(new ArrayList<TileEntityPlayerTransportTube>());
+				ArrayList<TileEntityPlayerTransportTube> ptt = new ArrayList<TileEntityPlayerTransportTube>();
+				ArrayList<TileEntityPlayerTransportTube> ptr = this.getAdjacentTubes();
+				ptt.add(this);
+				for (int x = 0; x < ptr.size(); x++) {
+					ptr.get(x).checkIfConnected(ptt);
+				}
 				this.oldNetworkSize = this.network.size();
+				System.out.println("DETECTED CHANGE IN NETWORK");
 			}
 			ArrayList<TileEntityPlayerTransportTube> ptt = this.getAdjacentTubes();
 			if (ptt.size() == 0) {
@@ -204,12 +215,29 @@ public class TileEntityPlayerTransportTube extends TileEntity {
 				tube.checkIfConnected(connectedTubes);
 				lastTube = false;
 				break;
+			} else if (tube.networkHost == tube) {
+				if (tube.network != null && this.networkHost.network.size() > tube.network.size())
+					for (int y = 0; y < tube.networkHost.network.size(); y++)
+						tube.networkHost.network.get(y).networkHost = this.networkHost;
+				else
+					for (int y = 0; y < this.networkHost.network.size(); y++)
+						this.networkHost.network.get(y).networkHost = tube.networkHost;
 			}
 		}
 		if (lastTube) {
-			for (int x = 0; x < this.networkHost.network.size(); x++) {
-				if (!connectedTubes.contains(this.networkHost.network.get(x)))
-					this.networkHost.network.remove(this.networkHost.network.get(x));
+			System.out.println("Last tube after " + (connectedTubes.size() - 1) + " others.");
+			boolean isFirst = false;
+			for (int x = 1; x < this.networkHost.network.size(); x++) {
+				if (!connectedTubes.contains(this.networkHost.network.get(x))) {
+					TileEntityPlayerTransportTube tube = this.networkHost.network.get(x);
+					if (!isFirst) {
+						tube.network = new ArrayList<TileEntityPlayerTransportTube>();
+						tube.setNetworkHost(tube);
+						tube.network.add(tube);
+						isFirst = true;
+					}
+					this.networkHost.network.remove(tube);
+				}
 			}
 		}
 	}
