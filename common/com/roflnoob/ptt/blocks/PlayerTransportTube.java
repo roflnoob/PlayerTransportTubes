@@ -57,6 +57,7 @@ public class PlayerTransportTube extends BlockContainer {
 			// if (ptt.networkHost != null)
 			// par5EntityPlayer.setPositionAndUpdate(ptt.networkHost.xCoord +
 			// 0.5D, ptt.networkHost.yCoord + 1, ptt.networkHost.zCoord + 0.5D);
+			System.out.println((ptt == ptt.networkHost));
 		}
 		return super.onBlockActivated(par1World, par2, par3, par4, par5EntityPlayer, par6, par7, par8, par9);
 	}

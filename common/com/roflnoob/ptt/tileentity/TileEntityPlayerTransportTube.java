@@ -40,7 +40,7 @@ public class TileEntityPlayerTransportTube extends TileEntity {
 					this.networkHost.network.add(this);
 				} else if (hosts.size() == 0 && this.networkHost != null) {
 					this.networkHost.network.remove(this);
-					this.network.clear();
+					this.network = new ArrayList<TileEntityPlayerTransportTube>();
 					this.id = 0;
 					this.networkHost = null;
 				}
@@ -126,7 +126,7 @@ public class TileEntityPlayerTransportTube extends TileEntity {
 		if (this.networkHost != null) {
 			this.networkHost.network.remove(this);
 		}
-		this.network.clear();
+		this.network = new ArrayList<TileEntityPlayerTransportTube>();
 		this.id = 0;
 		this.networkHost = null;
 		// ArrayList<TileEntityPlayerTransportTube> ptt =
@@ -172,11 +172,8 @@ public class TileEntityPlayerTransportTube extends TileEntity {
 		if (this.networkHost == this) {
 			if (this.oldNetworkSize != this.network.size()) {
 				ArrayList<TileEntityPlayerTransportTube> ptt = new ArrayList<TileEntityPlayerTransportTube>();
-				ArrayList<TileEntityPlayerTransportTube> ptr = this.getAdjacentTubes();
 				ptt.add(this);
-				for (int x = 0; x < ptr.size(); x++) {
-					ptr.get(x).checkIfConnected(ptt);
-				}
+				this.checkIfConnected(ptt);
 				this.oldNetworkSize = this.network.size();
 				System.out.println("DETECTED CHANGE IN NETWORK");
 			}
@@ -215,13 +212,13 @@ public class TileEntityPlayerTransportTube extends TileEntity {
 				tube.checkIfConnected(connectedTubes);
 				lastTube = false;
 				break;
-			} else if (tube.networkHost == tube) {
-				if (tube.network != null && this.networkHost.network.size() > tube.network.size())
-					for (int y = 0; y < tube.networkHost.network.size(); y++)
-						tube.networkHost.network.get(y).networkHost = this.networkHost;
-				else
-					for (int y = 0; y < this.networkHost.network.size(); y++)
-						this.networkHost.network.get(y).networkHost = tube.networkHost;
+			} else if (tube.networkHost != null && !connectedTubes.contains(tube)) {
+				if (tube.networkHost.network.size() > this.networkHost.network.size()) {
+					tube.networkHost = this.networkHost;
+				} else {
+					this.networkHost = tube.networkHost;
+				}
+				break;
 			}
 		}
 		if (lastTube) {
