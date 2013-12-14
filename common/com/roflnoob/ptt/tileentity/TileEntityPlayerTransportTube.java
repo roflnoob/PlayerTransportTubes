@@ -135,8 +135,11 @@ public class TileEntityPlayerTransportTube extends TileEntity {
 
 	}
 
+	public int oldNetworkSize = 0;
+
 	@Override
 	public void updateEntity() {
+
 		if (this.networkHost != null && this.networkHost != this) {
 			this.network = this.networkHost.network;
 			if (!this.networkHost.network.contains(this)) {
@@ -162,6 +165,10 @@ public class TileEntityPlayerTransportTube extends TileEntity {
 
 		}
 		if (this.networkHost == this) {
+			if (this.oldNetworkSize != this.network.size()) {
+				this.checkIfConnected(new ArrayList<TileEntityPlayerTransportTube>());
+				this.oldNetworkSize = this.network.size();
+			}
 			ArrayList<TileEntityPlayerTransportTube> ptt = this.getAdjacentTubes();
 			if (ptt.size() == 0) {
 				this.network.clear();
@@ -188,6 +195,22 @@ public class TileEntityPlayerTransportTube extends TileEntity {
 	}
 
 	public void checkIfConnected(ArrayList<TileEntityPlayerTransportTube> connectedTubes) {
-
+		ArrayList<TileEntityPlayerTransportTube> ptt = this.getAdjacentTubes();
+		boolean lastTube = true;
+		for (int x = 0; x < ptt.size(); x++) {
+			TileEntityPlayerTransportTube tube = ptt.get(x);
+			if (tube.networkHost == this.networkHost && !connectedTubes.contains(tube)) {
+				connectedTubes.add(tube);
+				tube.checkIfConnected(connectedTubes);
+				lastTube = false;
+				break;
+			}
+		}
+		if (lastTube) {
+			for (int x = 0; x < this.networkHost.network.size(); x++) {
+				if (!connectedTubes.contains(this.networkHost.network.get(x)))
+					this.networkHost.network.remove(this.networkHost.network.get(x));
+			}
+		}
 	}
 }

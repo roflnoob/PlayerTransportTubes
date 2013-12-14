@@ -49,7 +49,8 @@ public class PlayerTransportTube extends BlockContainer {
 			// " Z=" + ptt.network.get(x).zCoord);
 			// }
 			// System.out.println("--------------------------------------------");
-			System.out.println(ptt.network.size() + " " + ptt.id);
+			if (ptt.network != null)
+				System.out.println(ptt.network.size() + " " + ptt.id);
 			if (ptt.networkHost != null)
 				System.out.println(ptt.networkHost);
 			System.out.println(ptt);
